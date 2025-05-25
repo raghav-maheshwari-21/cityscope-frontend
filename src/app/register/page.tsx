@@ -10,10 +10,10 @@ export default function RegisterPage() {
     const [formData, setFormData] = useState({ name: "", email: "", password: "" });
     const [error, setError] = useState("");
 
-    const handleChange = (e: any) =>
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
         setFormData({ ...formData, [e.target.name]: e.target.value });
 
-    const handleSubmit = async (e: any) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
             const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, formData);
@@ -24,8 +24,12 @@ export default function RegisterPage() {
             else {
                 alert("Registration failed");
             }
-        } catch (err: any) {
-            setError(err.response?.data?.message || "Registration failed");
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                setError(err.response?.data?.message || "Registration failed");
+            } else {
+                setError("An unexpected error occurred");
+            }
         }
     };
 

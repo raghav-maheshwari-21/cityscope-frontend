@@ -5,20 +5,24 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from "jwt-decode";
 
+interface DecodedToken {
+  id: string; 
+}
+
 export default function Navbar() {
   const router = useRouter();
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const decoded: any = jwtDecode(token);
-        setUserId(decoded.id); // adjust if your token has a different structure
+        const decoded = jwtDecode<DecodedToken>(token);
+        setUserId(decoded.id);
         setIsLoggedIn(true);
       } catch (err) {
-        console.error("Invalid token");
+        console.error("Invalid token", err instanceof Error ? err.message : err);
         setIsLoggedIn(false);
       }
     }
